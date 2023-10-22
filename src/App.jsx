@@ -14,7 +14,7 @@ function App() {
             setInput("");
         };
         return (
-            <div>
+            <>
                 <TextField
                     id="todo-item-input"
                     label="Todo Item"
@@ -25,7 +25,18 @@ function App() {
                 <Button variant="outlined" onClick={onSubmit}>
                     Submit
                 </Button>
-            </div>
+            </>
+        );
+    };
+
+    const TodoItemList = (props) => {
+        const todoList = props.todoItemList.map((todoItem, index) => {
+            return <li key={index}>{todoItem.todoItemContent}</li>;
+        });
+        return (
+            <>
+                <ul>{todoList}</ul>
+            </>
         );
     };
 
@@ -35,6 +46,13 @@ function App() {
                 onSubmit={(input) => {
                     console.log(input);
                 }}
+            />
+            <TodoItemList
+                todoItemList={[
+                    {
+                        todoItemContent: "오늘 할일",
+                    },
+                ]}
             />
         </div>
     );
