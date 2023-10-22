@@ -31,16 +31,32 @@ const TodoItemInputField = (props) => {
 };
 
 const TodoItem = (props) => {
+    const check = props.todoItem.isFinished
+        ? { textDecoration: "line-through" }
+        : {};
     return (
         <li>
-            <span>{props.todoItem.todoItemContent}</span>
+            <span
+                style={check}
+                onClick={() => {
+                    props.onTodoItemClick(props.todoItem);
+                }}
+            >
+                {props.todoItem.todoItemContent}
+            </span>
         </li>
     );
 };
 
 const TodoItemList = (props) => {
     const todoList = props.todoItemList.map((todoItem, index) => {
-        return <TodoItem key={todoItem.id} todoItem={todoItem} />;
+        return (
+            <TodoItem
+                key={todoItem.id}
+                todoItem={todoItem}
+                onTodoItemClick={props.onTodoItemClick}
+            />
+        );
     });
     return (
         <>
@@ -58,14 +74,35 @@ function App() {
             {
                 id: todoItemId++,
                 todoItemContent: newTodoItem,
+                // 할일이 끝나쓰
                 isFinished: false,
             },
         ]);
     };
+
+    const onTodoItemClick = (clickedTodoItem) => {
+        setTodoItemList(
+            todoItemList.map((todoItem) => {
+                if (clickedTodoItem.id === todoItem.id) {
+                    return {
+                        id: clickedTodoItem.id,
+                        todoItemContent: clickedTodoItem.todoItemContent,
+                        isFinished: !clickedTodoItem.isFinished,
+                    };
+                } else {
+                    return todoItem;
+                }
+            })
+        );
+    };
+
     return (
         <div className="App">
             <TodoItemInputField onSubmit={newSubmit} />
-            <TodoItemList todoItemList={todoItemList} />
+            <TodoItemList
+                todoItemList={todoItemList}
+                onTodoItemClick={onTodoItemClick}
+            />
         </div>
     );
 }
