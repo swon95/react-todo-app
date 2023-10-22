@@ -44,6 +44,12 @@ const TodoItem = (props) => {
             >
                 {props.todoItem.todoItemContent}
             </span>
+            <Button
+                variant="outlined"
+                onClick={() => props.onRemoveClick(props.todoItem)}
+            >
+                Remove
+            </Button>
         </li>
     );
 };
@@ -55,6 +61,7 @@ const TodoItemList = (props) => {
                 key={todoItem.id}
                 todoItem={todoItem}
                 onTodoItemClick={props.onTodoItemClick}
+                onRemoveClick={props.onRemoveClick}
             />
         );
     });
@@ -96,12 +103,21 @@ function App() {
         );
     };
 
+    const onRemoveClick = (removedTodoItem) => {
+        setTodoItemList(
+            todoItemList.filter((todoItem) => {
+                return todoItem.id !== removedTodoItem.id;
+            })
+        );
+    };
+
     return (
         <div className="App">
             <TodoItemInputField onSubmit={newSubmit} />
             <TodoItemList
                 todoItemList={todoItemList}
                 onTodoItemClick={onTodoItemClick}
+                onRemoveClick={onRemoveClick}
             />
         </div>
     );
