@@ -17,6 +17,7 @@ import {
     getDocs,
     query,
     orderBy,
+    where,
 } from "firebase/firestore";
 import { AppBar, Toolbar, Typography } from "@mui/material";
 
@@ -173,8 +174,9 @@ function App() {
     const syncTodoItemListStateWithFireStore = () => {
         const sortingData = query(
             collection(db, "todoItem"),
-            orderBy("createdAt", "asc") // 역순정렬
-        );
+            where("userId", "==", currentUser),
+            orderBy("createdTime", "desc")
+        ); // 역순정렬
         getDocs(sortingData).then((querySnapshot) => {
             const firestoreTodoItemList = [];
             querySnapshot.forEach((doc) => {
@@ -182,7 +184,8 @@ function App() {
                     id: doc.id,
                     todoItemContent: doc.data().todoItemContent,
                     isFinished: doc.data().isFinished,
-                    createdAt: doc.data().createdAt ?? 0,
+                    createdTime: doc.data().createdTime ?? 0,
+                    userId: doc.data().userId,
                 });
             });
             setTodoItemList(firestoreTodoItemList);
@@ -191,7 +194,7 @@ function App() {
 
     useEffect(() => {
         syncTodoItemListStateWithFireStore();
-    }, []);
+    }, [currentUser]);
 
     // firebase connect & write
     const newSubmit = async (newTodoItem) => {
@@ -199,7 +202,8 @@ function App() {
         await addDoc(collection(db, "todoItem"), {
             todoItemContent: newTodoItem,
             isFinished: false,
-            createdAt: Math.floor(Date.now() / 1000), // 초 단위
+            createdTime: Math.floor(Date.now() / 1000), // 초 단위
+            userId: currentUser,
         });
         // update State
         syncTodoItemListStateWithFireStore();
