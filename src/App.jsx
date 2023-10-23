@@ -18,6 +18,15 @@ import {
     query,
     orderBy,
 } from "firebase/firestore";
+import { AppBar, Toolbar, Typography } from "@mui/material";
+
+import {
+    GoogleAuthProvider,
+    getAuth,
+    signInWithRedirect,
+    onAuthStateChanged,
+    signOut,
+} from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -38,6 +47,9 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 const db = getFirestore(app);
+
+const provider = new GoogleAuthProvider();
+const auth = getAuth(app);
 
 const TodoItemInputField = (props) => {
     const [input, setInput] = useState("");
@@ -106,8 +118,56 @@ const TodoItemList = (props) => {
     );
 };
 
+// ui
+const TodoListAppBar = (props) => {
+    const loginWithGoogleButton = (
+        <Button
+            color="inherit"
+            onClick={() => {
+                signInWithRedirect(auth, provider);
+            }}
+        >
+            Login with Google
+        </Button>
+    );
+    const logoutButton = (
+        <Button
+            color="inherit"
+            onClick={() => {
+                signOut(auth);
+            }}
+        >
+            Log out
+        </Button>
+    );
+
+    const button =
+        props.currentUser === null ? loginWithGoogleButton : logoutButton;
+
+    return (
+        <AppBar position="static">
+            <Toolbar>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    Todo List App
+                </Typography>
+                {button}
+            </Toolbar>
+        </AppBar>
+    );
+};
+
 function App() {
     const [todoItemList, setTodoItemList] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null);
+
+    // State 가 바뀔 때 함수 호출
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            setCurrentUser(user.uid);
+        } else {
+            setCurrentUser(null);
+        }
+    });
 
     // 함수 호출 시  => firestore 에 들어있는 정보를 가져와 state 를 init 해주는 함수
     const syncTodoItemListStateWithFireStore = () => {
@@ -167,6 +227,7 @@ function App() {
 
     return (
         <div className="App">
+            <TodoListAppBar currentUser={currentUser} />
             <TodoItemInputField onSubmit={newSubmit} />
             <TodoItemList
                 todoItemList={todoItemList}
