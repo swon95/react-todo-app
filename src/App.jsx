@@ -15,6 +15,8 @@ import {
     doc,
     deleteDoc,
     getDocs,
+    query,
+    orderBy,
 } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -109,13 +111,18 @@ function App() {
 
     // 함수 호출 시  => firestore 에 들어있는 정보를 가져와 state 를 init 해주는 함수
     const syncTodoItemListStateWithFireStore = () => {
-        getDocs(collection(db, "todoItem")).then((querySnapshot) => {
+        const sortingData = query(
+            collection(db, "todoItem"),
+            orderBy("createdAt", "asc") // 역순정렬
+        );
+        getDocs(sortingData).then((querySnapshot) => {
             const firestoreTodoItemList = [];
             querySnapshot.forEach((doc) => {
                 firestoreTodoItemList.push({
                     id: doc.id,
                     todoItemContent: doc.data().todoItemContent,
                     isFinished: doc.data().isFinished,
+                    createdAt: doc.data().createdAt ?? 0,
                 });
             });
             setTodoItemList(firestoreTodoItemList);
@@ -128,9 +135,11 @@ function App() {
 
     // firebase connect & write
     const newSubmit = async (newTodoItem) => {
+        // create Field
         await addDoc(collection(db, "todoItem"), {
             todoItemContent: newTodoItem,
             isFinished: false,
+            createdAt: Math.floor(Date.now() / 1000), // 초 단위
         });
         // update State
         syncTodoItemListStateWithFireStore();
