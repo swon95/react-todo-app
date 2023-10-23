@@ -107,7 +107,8 @@ const TodoItemList = (props) => {
 function App() {
     const [todoItemList, setTodoItemList] = useState([]);
 
-    useEffect(() => {
+    // 함수 호출 시  => firestore 에 들어있는 정보를 가져와 state 를 init 해주는 함수
+    const syncTodoItemListStateWithFireStore = () => {
         getDocs(collection(db, "todoItem")).then((querySnapshot) => {
             const firestoreTodoItemList = [];
             querySnapshot.forEach((doc) => {
@@ -119,24 +120,20 @@ function App() {
             });
             setTodoItemList(firestoreTodoItemList);
         });
+    };
+
+    useEffect(() => {
+        syncTodoItemListStateWithFireStore();
     }, []);
 
     // firebase connect & write
     const newSubmit = async (newTodoItem) => {
-        const docRef = await addDoc(collection(db, "todoItem"), {
+        await addDoc(collection(db, "todoItem"), {
             todoItemContent: newTodoItem,
             isFinished: false,
         });
         // update State
-        setTodoItemList([
-            ...todoItemList,
-            {
-                id: docRef.id,
-                todoItemContent: newTodoItem,
-                // 할일이 끝나쓰
-                isFinished: false,
-            },
-        ]);
+        syncTodoItemListStateWithFireStore();
     };
 
     const onTodoItemClick = async (clickedTodoItem) => {
@@ -148,19 +145,7 @@ function App() {
             { merge: true }
         );
 
-        setTodoItemList(
-            todoItemList.map((todoItem) => {
-                if (clickedTodoItem.id === todoItem.id) {
-                    return {
-                        id: clickedTodoItem.id,
-                        todoItemContent: clickedTodoItem.todoItemContent,
-                        isFinished: !clickedTodoItem.isFinished,
-                    };
-                } else {
-                    return todoItem;
-                }
-            })
-        );
+        syncTodoItemListStateWithFireStore();
     };
 
     const onRemoveClick = async (removedTodoItem) => {
@@ -168,11 +153,7 @@ function App() {
         const todoItemRef = doc(db, "todoItem", removedTodoItem.id);
         await deleteDoc(todoItemRef);
 
-        setTodoItemList(
-            todoItemList.filter((todoItem) => {
-                return todoItem.id !== removedTodoItem.id;
-            })
-        );
+        syncTodoItemListStateWithFireStore();
     };
 
     return (
