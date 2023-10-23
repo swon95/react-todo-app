@@ -13,6 +13,7 @@ import {
     addDoc,
     setDoc,
     doc,
+    deleteDoc,
 } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -147,7 +148,11 @@ function App() {
         );
     };
 
-    const onRemoveClick = (removedTodoItem) => {
+    const onRemoveClick = async (removedTodoItem) => {
+        // Remove todoItem update
+        const todoItemRef = doc(db, "todoItem", removedTodoItem.id);
+        await deleteDoc(todoItemRef);
+
         setTodoItemList(
             todoItemList.filter((todoItem) => {
                 return todoItem.id !== removedTodoItem.id;
