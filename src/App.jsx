@@ -1,63 +1,16 @@
 // import "./App.css";
 import { useState, useEffect } from "react";
+import Header from "./components/Layout/Header";
 import TodoItemInputField from "./components/TodoItemInputField";
 import TodoItemList from "./components/TodoItemList";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { AppBar, Toolbar, Typography } from "@mui/material";
-import {
-    provider,
-    auth,
-    signInWithRedirect,
-    onAuthStateChanged,
-    signOut,
-} from "./utils/auth";
 import {
     syncTodoItemListStateWithFireStore,
     newSubmit,
     onTodoItemClick,
     onRemoveClick,
 } from "./utils/firestore";
-
-// ui
-const TodoListAppBar = (props) => {
-    const loginWithGoogleButton = (
-        <Button
-            color="inherit"
-            onClick={() => {
-                signInWithRedirect(auth, provider);
-            }}
-        >
-            Login with Google
-        </Button>
-    );
-    const logoutButton = (
-        <Button
-            color="inherit"
-            onClick={() => {
-                signOut(auth);
-            }}
-        >
-            Log out
-        </Button>
-    );
-
-    const button =
-        props.currentUser === null ? loginWithGoogleButton : logoutButton;
-
-    return (
-        <AppBar position="static">
-            <Toolbar sx={{ width: "100%", maxWidth: 720, margin: "auto" }}>
-                <Typography variant="h6" component="div">
-                    Todo List App
-                </Typography>
-                <Box sx={{ flexGrow: 1 }} />
-                {button}
-            </Toolbar>
-        </AppBar>
-    );
-};
+import { auth, onAuthStateChanged } from "./utils/auth";
 
 function App() {
     const [todoItemList, setTodoItemList] = useState([]);
@@ -81,7 +34,7 @@ function App() {
     return (
         <>
             <div className="App">
-                <TodoListAppBar currentUser={currentUser} />
+                <Header currentUser={currentUser} />
 
                 <Container>
                     <TodoItemInputField onSubmit={newSubmit} />
@@ -92,7 +45,7 @@ function App() {
                     />
                 </Container>
             </div>
-            <div className="text-3xl font-bold text-blue-600 mt-10">asdd</div>
+            <div className="text-3xl font-bold text-blue-600">asdd</div>
         </>
     );
 }
