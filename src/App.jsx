@@ -1,4 +1,4 @@
-import "./App.css";
+// import "./App.css";
 import { useState, useEffect } from "react";
 import TodoItemInputField from "./components/TodoItemInputField";
 import TodoItemList from "./components/TodoItemList";
@@ -79,18 +79,21 @@ function App() {
     }, [currentUser]);
 
     return (
-        <div className="App">
-            <TodoListAppBar currentUser={currentUser} />
+        <>
+            <div className="App">
+                <TodoListAppBar currentUser={currentUser} />
 
-            <Container>
-                <TodoItemInputField onSubmit={newSubmit} />
-                <TodoItemList
-                    todoItemList={todoItemList}
-                    onTodoItemClick={onTodoItemClick}
-                    onRemoveClick={onRemoveClick}
-                />
-            </Container>
-        </div>
+                <Container>
+                    <TodoItemInputField onSubmit={newSubmit} />
+                    <TodoItemList
+                        todoItemList={todoItemList}
+                        onTodoItemClick={onTodoItemClick}
+                        onRemoveClick={onRemoveClick}
+                    />
+                </Container>
+            </div>
+            <div className="text-3xl font-bold text-blue-600 mt-10">asdd</div>
+        </>
     );
 }
 
